@@ -6,12 +6,14 @@
   <title>Revolução Francesa - Linha do Tempo Interativa</title>
   <style>
     :root {
-      --bg-color: #0d0f12;
-      --primary: #d4af37;
-      --card-bg: #1a1d24;
-      --text: #e0e0e0;
-      --accent: #c0392b;
-      --line-color: rgba(212, 175, 55, 0.4);
+      --bg-color: #f4f6f9;
+      --primary: #8b0000; /* Vermelho histórico */
+      --card-bg: #ffffff;
+      --text-main: #2b2b2b;
+      --text-muted: #4a4a4a;
+      --accent-gold: #d4af37;
+      --border-color: #e0e0e0;
+      --line-color: rgba(139, 0, 0, 0.35);
     }
 
     * {
@@ -22,7 +24,7 @@
 
     body {
       background-color: var(--bg-color);
-      color: var(--text);
+      color: var(--text-main);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       overflow-x: hidden;
     }
@@ -35,8 +37,10 @@
       width: 100%;
       padding: 20px;
       text-align: center;
-      background: linear-gradient(to bottom, rgba(13, 15, 18, 0.95), transparent);
+      background: linear-gradient(to bottom, rgba(244, 246, 249, 0.98), rgba(244, 246, 249, 0.8));
+      backdrop-filter: blur(5px);
       z-index: 10;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     header h1 {
@@ -45,18 +49,18 @@
       font-size: 1.8rem;
       letter-spacing: 2px;
       text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
-    /* Container principal da linha do tempo */
+    /* Container da linha do tempo */
     .timeline-container {
       position: relative;
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
-      padding: 120px 20px 200px 20px;
+      padding: 130px 20px 200px 20px;
     }
 
-    /* SVG para desenhar a linha orgânica fluida */
+    /* SVG para desenhar a linha orgânica */
     .timeline-svg {
       position: absolute;
       top: 0;
@@ -72,97 +76,74 @@
       stroke: var(--line-color);
       stroke-width: 4;
       stroke-dasharray: 8;
-      animation: dash 30s linear infinite;
     }
 
     /* Blocos de conteúdo */
     .timeline-item {
       position: relative;
       z-index: 2;
-      margin-bottom: 120px;
-      width: 80%;
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
-      opacity: 0.4;
-      transform: scale(0.9);
+      margin-bottom: 90px;
+      width: 85%;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      opacity: 0.5;
+      transform: scale(0.95);
     }
 
-    /* Posições orgânicas/irregulares (Intercaladas) */
+    /* Layout irregular em ziguezague */
     .timeline-item:nth-child(odd) {
-      margin-left: 5%;
+      margin-left: 2%;
     }
     .timeline-item:nth-child(even) {
-      margin-left: 15%;
+      margin-left: 13%;
     }
     .timeline-item:nth-child(3n) {
-      margin-left: 10%;
+      margin-left: 8%;
     }
     .timeline-item:nth-child(4n) {
       margin-left: 0%;
     }
 
-    /* Destaque do item ativo no centro */
+    /* Destaque do item focado no centro */
     .timeline-item.active {
       opacity: 1;
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
-    /* Estilo do Card (Bloquinho) */
+    /* Card Claro com Informações Sempre Visíveis */
     .card {
       background: var(--card-bg);
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      border-radius: 12px;
-      padding: 18px;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
       position: relative;
-    }
-
-    .card:hover {
-      border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
     }
 
     .card-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       color: var(--primary);
-      font-weight: 600;
+      font-weight: 700;
+      font-family: 'Georgia', serif;
     }
 
     .badge {
       font-size: 0.75rem;
-      background: var(--accent);
-      color: #fff;
-      padding: 3px 8px;
-      border-radius: 10px;
-    }
-
-    .toggle-icon {
-      font-size: 1.2rem;
+      background: #fdf2e9;
       color: var(--primary);
-      transition: transform 0.3s;
-    }
-
-    /* Conteúdo expansível do Card */
-    .card-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease-out, padding-top 0.3s;
-    }
-
-    .card.open .card-content {
-      max-height: 500px;
-      padding-top: 15px;
-    }
-
-    .card.open .toggle-icon {
-      transform: rotate(180deg);
+      border: 1px solid rgba(139, 0, 0, 0.2);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 600;
     }
 
     .card-content ul {
@@ -171,37 +152,41 @@
 
     .card-content li {
       position: relative;
-      padding-left: 20px;
+      padding-left: 22px;
       margin-bottom: 10px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      color: #ccc;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .card-content li:last-child {
+      margin-bottom: 0;
     }
 
     .card-content li::before {
       content: "•";
-      color: var(--primary);
-      font-size: 1.2rem;
+      color: var(--accent-gold);
+      font-size: 1.5rem;
       position: absolute;
-      left: 0;
-      top: -2px;
+      left: 2px;
+      top: -4px;
     }
 
-    /* Relógio / Widget Interativo (Fixo no Canto Inferior) */
+    /* Widget de Relógio Claro Interativo */
     .clock-widget {
       position: fixed;
       bottom: 25px;
       right: 25px;
       width: 75px;
       height: 75px;
-      background: #111;
+      background: #ffffff;
       border: 3px solid var(--primary);
       border-radius: 50%;
       z-index: 100;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8), 0 0 10px rgba(212, 175, 55, 0.4);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
       cursor: grab;
       user-select: none;
       touch-action: none;
@@ -218,7 +203,6 @@
       border-radius: 50%;
     }
 
-    /* Ponteiros */
     .hand {
       position: absolute;
       bottom: 50%;
@@ -238,7 +222,7 @@
       width: 2px;
       height: 30px;
       margin-left: -1px;
-      background: #fff;
+      background: var(--accent-gold);
     }
 
     .clock-center {
@@ -247,18 +231,17 @@
       left: 50%;
       width: 8px;
       height: 8px;
-      background: var(--accent);
+      background: var(--primary);
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
 
-    /* Detalhes do Relógio (Marcadores de Engrenagem) */
     .gear-teeth {
       position: absolute;
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 2px dashed rgba(212, 175, 55, 0.5);
+      border: 2px dashed rgba(139, 0, 0, 0.3);
     }
   </style>
 </head>
@@ -269,22 +252,20 @@
   </header>
 
   <div class="timeline-container" id="timeline">
-    <!-- SVG desenhado dinamicamente via JS -->
     <svg class="timeline-svg" id="svg-line"></svg>
 
     <!-- Bloco 1 -->
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
-          <span class="badge">1</span>
-          <h2 class="card-title">Crises do Século XVIII</h2>
-          <span class="toggle-icon">▼</span>
+          <h2 class="card-title">1. Crises do Século XVIII</h2>
+          <span class="badge">Pré-1789</span>
         </div>
         <div class="card-content">
           <ul>
             <li><strong>Sociedade Estamental:</strong> Divisão em Três Estados (Clero, Nobreza e Terceiro Estado).</li>
-            <li><strong>Crise Econômica:</strong> Gastos excessivos da corte, guerras e graves crises agrícolas.</li>
-            <li><strong>Crise Política:</strong> Enfraquecimento do absolutismo sob influência das ideias iluministas.</li>
+            <li><strong>Crise Econômica:</strong> Gastos excessivos da corte, guerras e severas crises agrícolas.</li>
+            <li><strong>Crise Política:</strong> Enfraquecimento do absolutismo sob influência iluminista.</li>
           </ul>
         </div>
       </div>
@@ -294,14 +275,13 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">2. Estados Gerais</h2>
           <span class="badge">Maio 1789</span>
-          <h2 class="card-title">Estados Gerais</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
-            <li>Convocação por Luís XVI para votar a reforma tributária.</li>
-            <li>Impasse entre voto por ordem (estado) e voto por cabeça (exigido pelo Terceiro Estado).</li>
+            <li>Convocação por Luís XVI para solucionar a crise financeira.</li>
+            <li>Impasse entre o voto por estado (tradicional) e voto por cabeça (exigido pelo Terceiro Estado).</li>
           </ul>
         </div>
       </div>
@@ -311,14 +291,13 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">3. Assembleia Constitucional</h2>
           <span class="badge">1789-1791</span>
-          <h2 class="card-title">Assembleia Constituint</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
             <li>Queda da Bastilha em 14 de julho de 1789.</li>
-            <li>Fim dos privilégios feudais e aprovação da Declaração dos Direitos do Homem e do Cidadão.</li>
+            <li>Abolição dos privilégios feudais e promulgação da Declaração dos Direitos do Homem e do Cidadão.</li>
           </ul>
         </div>
       </div>
@@ -328,14 +307,13 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">4. Jacobinos e Girondinos</h2>
           <span class="badge">1791+</span>
-          <h2 class="card-title">Jacobinos e Girondinos</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
-            <li><strong>Girondinos:</strong> Moderados, alta burguesia, sentavam-se à direita.</li>
-            <li><strong>Jacobinos:</strong> Radicais, baixa/média burguesia e sans-culottes, sentavam-se à esquerda.</li>
+            <li><strong>Girondinos:</strong> Moderados, defensores da alta burguesia (sentavam-se à direita).</li>
+            <li><strong>Jacobinos:</strong> Radicais, apoiados pelos sans-culottes (sentavam-se à esquerda).</li>
           </ul>
         </div>
       </div>
@@ -345,15 +323,14 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">5. República Jacobina</h2>
           <span class="badge">1792-1794</span>
-          <h2 class="card-title">República Jacobina</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
             <li>Proclamação da República e execução de Luís XVI na guilhotina.</li>
-            <li><strong>Fase do Terror:</strong> Liderada por Robespierre com perseguição a opositores.</li>
-            <li>Medidas populares como a Lei do Preço Máximo e abolição da escravidão colonial.</li>
+            <li><strong>Fase do Terror:</strong> Execuções em massa lideradas por Robespierre.</li>
+            <li>Criação do ensino gratuito, Lei do Preço Máximo e abolição da escravidão colonial.</li>
           </ul>
         </div>
       </div>
@@ -363,15 +340,14 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">6. Diretório</h2>
           <span class="badge">1795-1799</span>
-          <h2 class="card-title">Diretório</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
-            <li>Reação Termidoriana: alta burguesia retoma o poder.</li>
-            <li>Período de instabilidade, crise financeira e corrupção.</li>
-            <li>Encerra-se com o Golpe do 18 de Brumário por Napoleão Bonaparte.</li>
+            <li>Reação Termidoriana: alta burguesia retoma o controle.</li>
+            <li>Fase marcada por instabilidade política, crise de abastecimento e corrupção.</li>
+            <li>Termina com o Golpe do 18 de Brumário comandado por Napoleão.</li>
           </ul>
         </div>
       </div>
@@ -381,14 +357,13 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">7. Era Napoleônica: Consulado</h2>
           <span class="badge">1799-1804</span>
-          <h2 class="card-title">Era Napoleônica: Consulado</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
-            <li>Centralização do poder em Napoleão como Primeiro-Cônsul.</li>
-            <li>Criação do Banco da França e do Código Civil Napoleônico (1804).</li>
+            <li>Centralização do poder executivo nas mãos de Napoleão.</li>
+            <li>Reorganização financeira (Banco da França) e promulgação do Código Civil Napoleônico (1804).</li>
           </ul>
         </div>
       </div>
@@ -398,22 +373,22 @@
     <div class="timeline-item">
       <div class="card">
         <div class="card-header">
+          <h2 class="card-title">8. Era Napoleônica: Império</h2>
           <span class="badge">1804-1815</span>
-          <h2 class="card-title">Era Napoleônica: Império</h2>
-          <span class="toggle-icon">▼</span>
         </div>
         <div class="card-content">
           <ul>
-            <li>Coroação de Napoleão como imperador e expansão militar europeia.</li>
+            <li>Coroação de Napoleão como imperador e expansão militar na Europa.</li>
             <li>Decreto do Bloqueio Continental contra a Inglaterra.</li>
-            <li>Derrota na Batalha de Waterloo (1815) e Congresso de Viena.</li>
+            <li>Derrota na Batalha de Waterloo (1815) e reorganização no Congresso de Viena.</li>
           </ul>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- Alegoria do Relógio/Engrenagem Interativo -->
+  <!-- Alegoria do Relógio / Controle Fixo -->
   <div class="clock-widget" id="clock">
     <div class="gear-teeth"></div>
     <div class="clock-face">
@@ -424,20 +399,7 @@
   </div>
 
   <script>
-    // 1. Abrir e Fechar os Cards ao Clicar
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('click', () => {
-        const isOpen = card.classList.contains('open');
-        // Fecha todos
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('open'));
-        // Abre apenas o clicado se já não estivesse aberto
-        if (!isOpen) {
-          card.classList.add('open');
-        }
-      });
-    });
-
-    // 2. Traçar a linha SVG conectando os bloquinhos organicamente
+    // Conecta os blocos com a linha curva SVG
     function drawTimelineLine() {
       const items = document.querySelectorAll('.timeline-item');
       const svg = document.getElementById('svg-line');
@@ -450,7 +412,6 @@
 
       items.forEach((item, index) => {
         const rect = item.getBoundingClientRect();
-        // Ponto central de cada bloquinho em relação ao container
         const x = (rect.left + rect.width / 2) - containerRect.left;
         const y = (rect.top + rect.height / 2) - containerRect.top;
 
@@ -460,8 +421,6 @@
           const prevRect = items[index - 1].getBoundingClientRect();
           const prevY = (prevRect.top + prevRect.height / 2) - containerRect.top;
           const midY = (prevY + y) / 2;
-          
-          // Curva suave em S (Cubic Bezier)
           pathD += ` C ${x} ${midY}, ${x} ${midY}, ${x} ${y}`;
         }
       });
@@ -472,7 +431,7 @@
     window.addEventListener('load', drawTimelineLine);
     window.addEventListener('resize', drawTimelineLine);
 
-    // 3. Efeito da Câmera (Centralização) e Rotação do Relógio com base na Rolagem
+    // Efeito de Foco da Câmera e Giração dos Ponteiros ao Rolar
     const items = document.querySelectorAll('.timeline-item');
     const hourHand = document.getElementById('hour-hand');
     const minuteHand = document.getElementById('minute-hand');
@@ -482,14 +441,12 @@
       const currentScroll = window.scrollY;
       const scrollPercent = currentScroll / (scrollMax || 1);
 
-      // Rodar os ponteiros do relógio conforme a rola a página
-      const minuteRotation = scrollPercent * 360 * 8; // Dá 8 voltas completas
+      const minuteRotation = scrollPercent * 360 * 8;
       const hourRotation = scrollPercent * 360;
       
       minuteHand.style.transform = `rotate(${minuteRotation}deg)`;
       hourHand.style.transform = `rotate(${hourRotation}deg)`;
 
-      // Animação de Foco/Destaque nos bloquinhos conforme passam pelo centro da tela
       const viewportCenter = window.innerHeight / 2;
 
       items.forEach(item => {
@@ -497,7 +454,7 @@
         const itemCenter = rect.top + rect.height / 2;
         const distanceFromCenter = Math.abs(viewportCenter - itemCenter);
 
-        if (distanceFromCenter < 180) {
+        if (distanceFromCenter < 200) {
           item.classList.add('active');
         } else {
           item.classList.remove('active');
@@ -507,7 +464,7 @@
 
     window.addEventListener('scroll', onScroll);
 
-    // 4. Controle Interativo: Arrastar/Girar o Relógio para navegar na página
+    // Arrastar o relógio no canto para avançar a linha do tempo
     const clock = document.getElementById('clock');
     let isDragging = false;
     let startY = 0;
@@ -522,9 +479,8 @@
     const doDrag = (e) => {
       if (!isDragging) return;
       const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-      const deltaY = startY - currentY; // Arrastar para cima/baixo
+      const deltaY = startY - currentY;
       
-      // Controla a sensibilidade do scroll pelo relógio
       window.scrollTo({
         top: startScroll + deltaY * 4.5,
         behavior: 'smooth'
@@ -535,7 +491,6 @@
       isDragging = false;
     };
 
-    // Eventos de Touch (Celular) e Mouse (Desktop)
     clock.addEventListener('mousedown', startDrag);
     window.addEventListener('mousemove', doDrag);
     window.addEventListener('mouseup', stopDrag);
