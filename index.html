@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Corredor 3D - Revolução Francesa</title>
+  <title>Museu da Revolução Francesa 3D</title>
   <style>
     * {
       box-sizing: border-box;
@@ -15,9 +15,9 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #e5e9f0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      touch-action: none; /* Evita comportamentos padrão de scroll no celular */
+      background-color: #050505;
+      font-family: 'Georgia', serif;
+      touch-action: none;
     }
 
     #canvas-container {
@@ -26,65 +26,106 @@
       display: block;
     }
 
-    /* Interface de Instruções Sobreposta */
-    #ui {
+    /* Topo com Título */
+    #ui-header {
       position: absolute;
       top: 15px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.85);
-      padding: 10px 20px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: rgba(15, 12, 10, 0.85);
+      border: 1px solid #d4af37;
+      padding: 8px 20px;
+      border-radius: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
       text-align: center;
       pointer-events: none;
       z-index: 10;
-      width: 90%;
-      max-width: 400px;
+      width: 85%;
+      max-width: 380px;
     }
 
-    #ui h1 {
+    #ui-header h1 {
       font-size: 1.1rem;
-      color: #8b0000;
-      font-family: 'Georgia', serif;
-      margin-bottom: 3px;
+      color: #d4af37;
+      letter-spacing: 1px;
     }
 
-    #ui p {
-      font-size: 0.75rem;
-      color: #4a4a4a;
+    #ui-header p {
+      font-size: 0.7rem;
+      color: #ccc;
+      font-family: sans-serif;
+    }
+
+    /* Controles de Navegação (Setas na Tela) */
+    .nav-controls {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 20;
+    }
+
+    .nav-btn {
+      width: 65px;
+      height: 65px;
+      background: rgba(20, 15, 10, 0.85);
+      border: 2px solid #d4af37;
+      border-radius: 50%;
+      color: #d4af37;
+      font-size: 1.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.9);
+      background: #d4af37;
+      color: #000;
     }
   </style>
-  <!-- Biblioteca Three.js via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <div id="ui">
-    <h1>Revolução Francesa 3D</h1>
-    <p>📱 Arraste para Cima/Baixo para andar | Arraste para os Lados para olhar</p>
+  <div id="ui-header">
+    <h1>Museu da Revolução Francesa</h1>
+    <p>Use as setas para andar • Arraste na tela para olhar</p>
+  </div>
+
+  <!-- Botões de Controle na Parte Inferior -->
+  <div class="nav-controls">
+    <div class="nav-btn" id="btn-back">▼</div>
+    <div class="nav-btn" id="btn-fwd">▲</div>
   </div>
 
   <div id="canvas-container"></div>
 
   <script>
     // ----------------------------------------------------
-    // 1. DADOS DOS CARTAZES (CONTEÚDO DAS PAREDES)
+    // 1. DADOS DOS QUADROS HISTÓRICOS
     // ----------------------------------------------------
-    const tópicos = [
+    const obras = [
       {
-        num: "1",
+        num: "I",
         titulo: "Crises do Século XVIII",
         data: "Pré-1789",
         lado: "esquerda",
         texto: [
-          "• Sociedade Estamental: 3 Estados.",
-          "• Crise econômica e agrícola grave.",
-          "• Enfraquecimento do Absolutismo."
+          "• Divisão em Três Estados.",
+          "• Grave crise financeira e agrícola.",
+          "• Difusão dos ideais Iluministas."
         ]
       },
       {
-        num: "2",
+        num: "II",
         titulo: "Estados Gerais",
         data: "Maio 1789",
         lado: "direita",
@@ -95,51 +136,51 @@
         ]
       },
       {
-        num: "3",
+        num: "III",
         titulo: "Assembleia Constitucional",
         data: "1789-1791",
         lado: "esquerda",
         texto: [
-          "• Queda da Bastilha (14/07/1789).",
+          "• Queda da Bastilha (14 de Julho).",
           "• Fim dos privilégios feudais.",
-          "• Declaração dos Direitos do Homem."
+          "• Direitos do Homem e do Cidadão."
         ]
       },
       {
-        num: "4",
+        num: "IV",
         titulo: "Jacobinos e Girondinos",
         data: "1791+",
         lado: "direita",
         texto: [
           "• Girondinos: Moderados (Alta Burguesia).",
           "• Jacobinos: Radicais (Sans-culottes).",
-          "• Conflitos pelo rumo da Revolução."
+          "• Disputas pelo controle do Estado."
         ]
       },
       {
-        num: "5",
+        num: "V",
         titulo: "República Jacobina",
         data: "1792-1794",
         lado: "esquerda",
         texto: [
           "• Execução do rei Luís XVI.",
-          "• Fase do Terror (Robespierre).",
+          "• Período do Terror (Robespierre).",
           "• Lei do Preço Máximo e Fim da Escravidão."
         ]
       },
       {
-        num: "6",
+        num: "VI",
         titulo: "O Diretório",
         data: "1795-1799",
         lado: "direita",
         texto: [
-          "• Reação Termidoriana (Girondinos).",
-          "• Período de forte instabilidade.",
-          "• Golpe do 18 de Brumário."
+          "• Retomada pela Alta Burguesia.",
+          "• Fase de instabilidade e corrupção.",
+          "• Encerramento com o 18 de Brumário."
         ]
       },
       {
-        num: "7",
+        num: "VII",
         titulo: "Consulado Napoleônico",
         data: "1799-1804",
         lado: "esquerda",
@@ -150,253 +191,343 @@
         ]
       },
       {
-        num: "8",
+        num: "VIII",
         titulo: "Império Napoleônico",
         data: "1804-1815",
         lado: "direita",
         texto: [
-          "• Napoleão coroado Imperador.",
-          "• Decreto do Bloqueio Continental.",
-          "• Derrota em Waterloo e Congr. de Viena."
+          "• Coroação de Napoleão como Imperador.",
+          "• Bloqueio Continental à Inglaterra.",
+          "• Queda em Waterloo e Congr. de Viena."
         ]
       }
     ];
 
     // ----------------------------------------------------
-    // 2. CONFIGURAÇÃO DA CENA 3D (THREE.JS)
+    // 2. CENA E CÂMERA (PRIMEIRA PESSOA)
     // ----------------------------------------------------
     const container = document.getElementById('canvas-container');
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f3f8);
-    scene.fog = new THREE.Fog(0xf0f3f8, 10, 50); // Névoa suave ao fundo
+    scene.background = new THREE.Color(0x0a0806);
+    scene.fog = new THREE.FogExp2(0x0a0806, 0.03); // Névoa intimista de museu
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
     
-    // Posição inicial da câmera (Primeira Pessoa)
     let camZ = 0;
-    let camYaw = 0; // Rotação Horizontal (Olhar para os lados)
-    
-    camera.position.set(0, 1.6, camZ); // Altura de 1.6m (olhos)
+    let camYaw = 0;
+    let camPitch = 0;
+    camera.position.set(0, 1.6, camZ);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
     // ----------------------------------------------------
-    // 3. ILUMINAÇÃO DO CORREDOR
+    // 3. TEXTURAS PROCEDURAIS (TAPETE VERMELHO & MADEIRA)
     // ----------------------------------------------------
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-    scene.add(ambientLight);
+    // Tapete Vermelho Ornamentado
+    function gerarTexturaTapete() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
 
-    const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.5);
-    dirLight.position.set(0, 4, 0);
-    scene.add(dirLight);
+      // Fundo Vinho/Vermelho Escuro
+      ctx.fillStyle = '#66000e';
+      ctx.fillRect(0, 0, 512, 512);
 
-    // Lâmpadas ao longo do corredor
-    const totalDistancia = tópicos.length * 6 + 10;
-    for (let z = 0; z > -totalDistancia; z -= 8) {
-      const light = new THREE.PointLight(0xffeedd, 0.8, 8);
-      light.position.set(0, 3.2, z);
-      scene.add(light);
+      // Bordas Douradas Trabalhadas
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 12;
+      ctx.strokeRect(10, 10, 492, 492);
+      ctx.lineWidth = 4;
+      ctx.strokeRect(25, 25, 462, 462);
+
+      // Padronagem Clássica
+      ctx.fillStyle = '#800014';
+      for(let x = 40; x < 512; x += 60) {
+        for(let y = 40; y < 512; y += 60) {
+          ctx.beginPath();
+          ctx.arc(x, y, 12, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      return texture;
     }
 
     // ----------------------------------------------------
-    // 4. CONSTRUÇÃO DO CORREDOR (PAREDES, CHÃO, TETO)
+    // 4. ESTRUTURA DO MUSEU (PAREDES, TAPETE, TETO)
     // ----------------------------------------------------
-    const larguraCorredor = 4;
-    const alturaCorredor = 3.5;
-    const comprimentoCorredor = totalDistancia + 5;
+    const larguraCorredor = 4.5;
+    const alturaCorredor = 4.0;
+    const totalDistancia = obras.length * 6.5 + 8;
 
-    // Textura/Material do Chão
-    const floorGeo = new THREE.PlaneGeometry(larguraCorredor, comprimentoCorredor);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0xd0d7de, roughness: 0.4 });
+    // Chão com Tapete
+    const floorGeo = new THREE.PlaneGeometry(larguraCorredor, totalDistancia);
+    const tapeteTex = gerarTexturaTapete();
+    tapeteTex.repeat.set(2, totalDistancia / 3);
+    const floorMat = new THREE.MeshStandardMaterial({ map: tapeteTex, roughness: 0.6 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set(0, 0, -comprimentoCorredor / 2 + 2);
+    floor.position.set(0, 0, -totalDistancia / 2 + 2);
     scene.add(floor);
 
+    // Paredes de Museu (Tom Escuro Elegante)
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x1f1915, roughness: 0.9 });
+    const wallGeo = new THREE.PlaneGeometry(totalDistancia, alturaCorredor);
+
     // Parede Esquerda
-    const wallLeftGeo = new THREE.PlaneGeometry(comprimentoCorredor, alturaCorredor);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0xfbfeff, roughness: 0.8 });
-    const wallLeft = new THREE.Mesh(wallLeftGeo, wallMat);
+    const wallLeft = new THREE.Mesh(wallGeo, wallMat);
     wallLeft.rotation.y = Math.PI / 2;
-    wallLeft.position.set(-larguraCorredor / 2, alturaCorredor / 2, -comprimentoCorredor / 2 + 2);
+    wallLeft.position.set(-larguraCorredor / 2, alturaCorredor / 2, -totalDistancia / 2 + 2);
     scene.add(wallLeft);
 
     // Parede Direita
-    const wallRight = new THREE.Mesh(wallLeftGeo, wallMat);
+    const wallRight = new THREE.Mesh(wallGeo, wallMat);
     wallRight.rotation.y = -Math.PI / 2;
-    wallRight.position.set(larguraCorredor / 2, alturaCorredor / 2, -comprimentoCorredor / 2 + 2);
+    wallRight.position.set(larguraCorredor / 2, alturaCorredor / 2, -totalDistancia / 2 + 2);
     scene.add(wallRight);
 
+    // Rodapé de Madeira nas Paredes
+    const rodapeGeo = new THREE.BoxGeometry(0.1, 0.3, totalDistancia);
+    const rodapeMat = new THREE.MeshStandardMaterial({ color: 0x2b1810, roughness: 0.4 });
+    const rodapeEsq = new THREE.Mesh(rodapeGeo, rodapeMat);
+    rodapeEsq.position.set(-larguraCorredor/2 + 0.05, 0.15, -totalDistancia / 2 + 2);
+    scene.add(rodapeEsq);
+
+    const rodapeDir = new THREE.Mesh(rodapeGeo, rodapeMat);
+    rodapeDir.position.set(larguraCorredor/2 - 0.05, 0.15, -totalDistancia / 2 + 2);
+    scene.add(rodapeDir);
+
     // Teto
-    const ceilingGeo = new THREE.PlaneGeometry(larguraCorredor, comprimentoCorredor);
-    const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0 });
+    const ceilingGeo = new THREE.PlaneGeometry(larguraCorredor, totalDistancia);
+    const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x0f0d0b });
     const ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
     ceiling.rotation.x = Math.PI / 2;
-    ceiling.position.set(0, alturaCorredor, -comprimentoCorredor / 2 + 2);
+    ceiling.position.set(0, alturaCorredor, -totalDistancia / 2 + 2);
     scene.add(ceiling);
 
-    // Parede de Fundo (Fim do Corredor)
-    const backWallGeo = new THREE.PlaneGeometry(larguraCorredor, alturaCorredor);
-    const backWall = new THREE.Mesh(backWallGeo, wallMat);
-    backWall.position.set(0, alturaCorredor / 2, -comprimentoCorredor + 2);
-    scene.add(backWall);
+    // ----------------------------------------------------
+    // 5. ILUMINAÇÃO DE MUSEU (LUZ AMBIENTE BAIXA + SPOTS)
+    // ----------------------------------------------------
+    const ambientLight = new THREE.AmbientLight(0xfff8ed, 0.25); // Luz geral tênue
+    scene.add(ambientLight);
 
     // ----------------------------------------------------
-    // 5. CRIAÇÃO DINÂMICA DOS CARTAZES NAS PAREDES
+    // 6. TELA/TELAS DAS OBRAS + MOLDURAS DOURADAS
     // ----------------------------------------------------
-    function criarTexturaCartaz(item) {
+    function criarTexturaTela(item) {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 700;
       const ctx = canvas.getContext('2d');
 
-      // Fundo do Cartaz
-      ctx.fillStyle = '#ffffff';
+      // Fundo Papel Antigo/Pergaminho
+      ctx.fillStyle = '#f8f4e6';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Borda do Cartaz
+      // Moldura Interna Delicada
       ctx.strokeStyle = '#8b0000';
-      ctx.lineWidth = 16;
-      ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+      ctx.lineWidth = 6;
+      ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
 
-      // Topo (Badge)
+      // Título da Obra
       ctx.fillStyle = '#8b0000';
-      ctx.fillRect(20, 20, canvas.width - 40, 70);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 28px Georgia';
+      ctx.font = 'bold 26px Georgia';
       ctx.textAlign = 'center';
-      ctx.fillText(`TÓPICO ${item.num} - ${item.data}`, canvas.width / 2, 65);
+      ctx.fillText(`SALA ${item.num}`, canvas.width / 2, 60);
 
-      // Título
       ctx.fillStyle = '#1a1a1a';
-      ctx.font = 'bold 32px Georgia';
-      ctx.fillText(item.titulo, canvas.width / 2, 140);
+      ctx.font = 'bold 30px Georgia';
+      ctx.fillText(item.titulo, canvas.width / 2, 110);
 
-      // Linha Divisória
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'italic 20px Georgia';
+      ctx.fillText(`— ${item.data} —`, canvas.width / 2, 140);
+
+      // Linha Separadora
       ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(50, 160);
-      ctx.lineTo(canvas.width - 50, 160);
+      ctx.moveTo(60, 160);
+      ctx.lineTo(canvas.width - 60, 160);
       ctx.stroke();
 
-      // Texto/Bullet Points
-      ctx.fillStyle = '#333333';
-      ctx.font = '24px Arial';
+      // Conteúdo Explicativo
+      ctx.fillStyle = '#2b2b2b';
+      ctx.font = '22px Georgia';
       ctx.textAlign = 'left';
 
       let startY = 220;
       item.texto.forEach(linha => {
-        // Quebra automática de linha simples no canvas
         const palavras = linha.split(' ');
         let linhaAtual = '';
         for (let n = 0; n < palavras.length; n++) {
           let testLinha = linhaAtual + palavras[n] + ' ';
           let metrics = ctx.measureText(testLinha);
-          if (metrics.width > canvas.width - 80 && n > 0) {
-            ctx.fillText(linhaAtual, 40, startY);
+          if (metrics.width > canvas.width - 90 && n > 0) {
+            ctx.fillText(linhaAtual, 45, startY);
             linhaAtual = palavras[n] + ' ';
-            startY += 35;
+            startY += 32;
           } else {
             linhaAtual = testLinha;
           }
         }
-        ctx.fillText(linhaAtual, 40, startY);
+        ctx.fillText(linhaAtual, 45, startY);
         startY += 55;
       });
 
-      const texture = new THREE.CanvasTexture(canvas);
-      return texture;
+      return new THREE.CanvasTexture(canvas);
     }
 
-    // Adiciona os cartazes ao longo do corredor
-    tópicos.forEach((item, index) => {
-      const zPos = -(index * 6 + 4); // Espaçamento de 6 metros entre cartazes
-      const posterGeo = new THREE.PlaneGeometry(1.6, 2.2);
-      const posterMat = new THREE.MeshBasicMaterial({
-        map: criarTexturaCartaz(item),
-        side: THREE.DoubleSide
-      });
-      const poster = new THREE.Mesh(posterGeo, posterMat);
+    // Geometria da Moldura Dourada Trabalhada
+    const molduraMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      metalness: 0.85,
+      roughness: 0.25
+    });
+
+    obras.forEach((item, index) => {
+      const zPos = -(index * 6.5 + 4);
+      const grupoQuadro = new THREE.Group();
+
+      // Tela
+      const canvasGeo = new THREE.PlaneGeometry(1.5, 2.1);
+      const canvasMat = new THREE.MeshBasicMaterial({ map: criarTexturaTela(item) });
+      const telaMesh = new THREE.Mesh(canvasGeo, canvasMat);
+      telaMesh.position.z = 0.04;
+      grupoQuadro.add(telaMesh);
+
+      // Moldura Dourada Ornamentada (Estrutura Externa)
+      const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(1.75, 2.35, 0.08), molduraMat);
+      grupoQuadro.add(frameOuter);
+
+      const frameInner = new THREE.Mesh(new THREE.BoxGeometry(1.58, 2.18, 0.09), new THREE.MeshStandardMaterial({ color: 0x4a3710, roughness: 0.5 }));
+      grupoQuadro.add(frameInner);
+
+      // Posicionamento e Inclinação Leve (Angulados para leitura)
+      const anguloInclinacao = Math.PI / 7; // ~25 graus em direção ao visitante
 
       if (item.lado === 'esquerda') {
-        poster.position.set(-larguraCorredor / 2 + 0.02, 1.7, zPos);
-        poster.rotation.y = Math.PI / 2;
+        grupoQuadro.position.set(-larguraCorredor / 2 + 0.35, 1.8, zPos);
+        grupoQuadro.rotation.y = Math.PI / 2 - anguloInclinacao; // Inclinado para frente
       } else {
-        poster.position.set(larguraCorredor / 2 - 0.02, 1.7, zPos);
-        poster.rotation.y = -Math.PI / 2;
+        grupoQuadro.position.set(larguraCorredor / 2 - 0.35, 1.8, zPos);
+        grupoQuadro.rotation.y = -Math.PI / 2 + anguloInclinacao; // Inclinado para frente
       }
 
-      scene.add(poster);
+      scene.add(grupoQuadro);
+
+      // Spot Light Exclusivo Direcionado para o Quadro (Luz de Museu)
+      const spotLight = new THREE.SpotLight(0xfff2a3, 3.5);
+      spotLight.angle = Math.PI / 6;
+      spotLight.penumbra = 0.4;
+      spotLight.decay = 2;
+      spotLight.distance = 7;
+
+      // Posição da lâmpada no teto
+      const posX = item.lado === 'esquerda' ? -1.2 : 1.2;
+      spotLight.position.set(posX, alturaCorredor - 0.2, zPos);
+      spotLight.target = telaMesh;
+
+      scene.add(spotLight);
+      scene.add(spotLight.target);
     });
 
     // ----------------------------------------------------
-    // 6. CONTROLES DE NAVEGAÇÃO PARA CELULAR E MOUSE
+    // 7. CONTROLES (SETAS PARA ANDAR + TOQUE PARA OLHAR)
     // ----------------------------------------------------
+    let moveForward = false;
+    let moveBackward = false;
+
+    const btnFwd = document.getElementById('btn-fwd');
+    const btnBack = document.getElementById('btn-back');
+
+    // Eventos dos Botões de Seta
+    const startFwd = (e) => { e.preventDefault(); moveForward = true; };
+    const stopFwd = (e) => { e.preventDefault(); moveForward = false; };
+    const startBack = (e) => { e.preventDefault(); moveBackward = true; };
+    const stopBack = (e) => { e.preventDefault(); moveBackward = false; };
+
+    btnFwd.addEventListener('touchstart', startFwd);
+    btnFwd.addEventListener('touchend', stopFwd);
+    btnFwd.addEventListener('mousedown', startFwd);
+    btnFwd.addEventListener('mouseup', stopFwd);
+
+    btnBack.addEventListener('touchstart', startBack);
+    btnBack.addEventListener('touchend', stopBack);
+    btnBack.addEventListener('mousedown', startBack);
+    btnBack.addEventListener('mouseup', stopBack);
+
+    // Olhar em 360° Arrastando o Dedo na Tela Livremente
     let touchStartX = 0;
     let touchStartY = 0;
 
-    // Sensibilidade dos controles
-    const speed = 0.008;
-    const rotationSpeed = 0.005;
-
-    // Limites de deslocamento no corredor
-    const maxZ = 1;
-    const minZ = -comprimentoCorredor + 3;
-
-    // Suporte para Toque no Celular
     window.addEventListener('touchstart', (e) => {
+      if (e.target.classList.contains('nav-btn')) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     });
 
     window.addEventListener('touchmove', (e) => {
-      const touchX = e.touches[0].clientX;
-      const touchY = e.touches[0].clientY;
+      if (e.target.classList.contains('nav-btn')) return;
 
-      const deltaX = touchX - touchStartX;
-      const deltaY = touchY - touchStartY;
+      const deltaX = e.touches[0].clientX - touchStartX;
+      const deltaY = e.touches[0].clientY - touchStartY;
 
-      // Arrastar para Cima/Baixo = Mover para Frente/Trás
-      camZ += deltaY * speed;
-      camZ = Math.max(minZ, Math.min(maxZ, camZ)); // Aplica limites
+      camYaw += deltaX * 0.005;
+      camPitch += deltaY * 0.003;
 
-      // Arrastar para os Lados = Olhar Esquerda/Direita
-      camYaw += deltaX * rotationSpeed;
-      // Limita o ângulo para não girar o pescoço 360° desnecessariamente (-90° a +90°)
-      camYaw = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camYaw));
+      // Limite para olhar para cima/baixo
+      camPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, camPitch));
 
-      touchStartX = touchX;
-      touchStartY = touchY;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
     });
 
-    // Suporte para Scroll do Mouse (Desktop)
-    window.addEventListener('wheel', (e) => {
-      camZ -= e.deltaY * 0.005;
-      camZ = Math.max(minZ, Math.min(maxZ, camZ));
-    });
-
-    // Suporte para Mover o Mouse (Olhar para os lados no Desktop)
+    // Olhar com o Mouse no PC
     let isMouseDown = false;
-    let mouseX = 0;
+    let mouseX = 0, mouseY = 0;
 
-    window.addEventListener('mousedown', (e) => { isMouseDown = true; mouseX = e.clientX; });
-    window.addEventListener('mouseup', () => { isMouseDown = false; });
+    window.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('nav-btn')) return;
+      isMouseDown = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => isMouseDown = false);
     window.addEventListener('mousemove', (e) => {
       if (!isMouseDown) return;
       const deltaX = e.clientX - mouseX;
-      camYaw += deltaX * rotationSpeed;
-      camYaw = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camYaw));
+      const deltaY = e.clientY - mouseY;
+
+      camYaw += deltaX * 0.004;
+      camPitch += deltaY * 0.003;
+      camPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, camPitch));
+
       mouseX = e.clientX;
+      mouseY = e.clientY;
     });
 
-    // Redimensionamento de Tela
+    // Suporte a Teclas WSAD / Setas do Teclado
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'w') moveForward = true;
+      if (e.key === 'ArrowDown' || e.key === 's') moveBackward = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'w') moveForward = false;
+      if (e.key === 'ArrowDown' || e.key === 's') moveBackward = false;
+    });
+
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -404,16 +535,32 @@
     });
 
     // ----------------------------------------------------
-    // 7. LOOP DE RENDERIZAÇÃO
+    // 8. LOOP DE ANIMAÇÃO E RENDERIZAÇÃO
     // ----------------------------------------------------
+    const walkSpeed = 0.08;
+    const maxZ = 1;
+    const minZ = -totalDistancia + 4;
+
     function animate() {
       requestAnimationFrame(animate);
 
-      // Atualiza posição Z da câmera com interpolação suave
+      // Movimentação pelas Setas
+      if (moveForward) {
+        camZ -= walkSpeed;
+      }
+      if (moveBackward) {
+        camZ += walkSpeed;
+      }
+
+      camZ = Math.max(minZ, Math.min(maxZ, camZ));
+
+      // Suavização do movimento Z da Câmera
       camera.position.z += (camZ - camera.position.z) * 0.1;
 
-      // Atualiza a rotação de olhar para os lados
+      // Aplicação da rotação da visão (Olhar para os lados e cima/baixo)
+      camera.rotation.order = "YXZ";
       camera.rotation.y = camYaw;
+      camera.rotation.x = camPitch;
 
       renderer.render(scene, camera);
     }
